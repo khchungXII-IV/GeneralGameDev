@@ -5,13 +5,16 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 // Code for 2D platformer player movement using kinematic Rigidbody2D. Implements the following features:
-// - Custom gravity with increased fall speed and terminal velocity
 // - Ground collisions
-// - Variable height jumping and coyote jump
-// - Smoothed left/right movement
-// - Wall collisions, wall sliding, and wall jumping
 // - Ceiling collisions
-
+// - Wall collisions and wall sliding
+// - Wall climbing
+// - Custom gravity with increased fall speed and terminal velocity
+// - Variable height jumping and coyote jump
+// - Air jumps
+// - Wall jumping
+// - Smoothed left/right movement and sprinting
+// - Distance based dash
 {
     // --------------------------------------------------------------------------------------------------
     // REFERENCES
@@ -448,4 +451,5 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isGrounded || isOnWall) currAirMoves = maxAirMoves;
     }
+
 }
