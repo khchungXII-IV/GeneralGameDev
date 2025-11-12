@@ -38,6 +38,12 @@ public class PlayerMovement : MonoBehaviour
     private bool isOnWall;
     private float normalDir; // Direction opposite to wall
     public float wallSlideFract = 0.7f; // Reduces fall speed when on wall
+
+    // Wallclimb variables
+    private bool climbPressed;
+    private bool isClimbing;
+    private float yDir;
+    public float climbSpeed = 5f;
     
     // Gravity variables
     public float gravity = -25f; // Downwards acceleration due to gravity
@@ -102,12 +108,15 @@ public class PlayerMovement : MonoBehaviour
         // Action subscriptions
         controls.Player.JUMP.performed += ctx => onJumpPressed();
         controls.Player.JUMP.canceled += ctx => jumpCut();
-
         controls.Player.MOVE.performed += ctx => dirInput = ctx.ReadValue<float>();
         controls.Player.MOVE.canceled += ctx => dirInput = 0f;
         controls.Player.MOVE.performed += ctx => facingDir = ctx.ReadValue<float>();
         controls.Player.DASH.performed += ctx => onDashPressed();
         controls.Player.TOGGLESPRINT.performed += ctx => toggleSprint();
+        controls.Player.CLIMB.performed += ctx => climbPressed = true;
+        controls.Player.CLIMB.canceled += ctx => climbPressed = false;
+        controls.Player.UPDOWN.performed += ctx => yDir = ctx.ReadValue<float>();
+        controls.Player.UPDOWN.canceled += ctx => yDir = 0f;
     }
 
     void FixedUpdate()
@@ -118,6 +127,7 @@ public class PlayerMovement : MonoBehaviour
         checkGrounded();
         checkCeiling();
         wallSlide();
+        wallClimb();
         createGravity();
         jump();
         airJump();
@@ -215,7 +225,7 @@ public class PlayerMovement : MonoBehaviour
             wallCheckRight.position, collisionCheckRad, Vector2.right,
             Mathf.Abs(velocity.x * Time.fixedDeltaTime) + 0.05f, groundWallMask
         ); // Circle cast right to detect wall
-        
+
         isOnWall = wallCollisionLeft.collider != null || wallCollisionRight.collider != null; // True if either CircleCast collides with wall, false otherwise
         if (isOnWall)
         {
@@ -236,10 +246,44 @@ public class PlayerMovement : MonoBehaviour
             else normalDir = 0f;
 
             if (MathF.Sign(dirInput) == -normalDir) body.position = wallSnap; // Snaps to wall if inputting into it
-            if (velocity.y < 0) velocity.y *= wallSlideFract; // Slows down falling speed if falling on wall
+            if (velocity.y < 0 && !isClimbing) velocity.y *= wallSlideFract; // Slows down falling speed if falling on wall
 
             wallJumpTimer = wallJumpTime; // Sets wall jump timer
         }
+    }
+    
+    void wallClimb()
+    // Stops player from falling on wall if player is holding onto it. Also lets them climb up and down.
+    {
+        if (isOnWall && climbPressed)
+        {
+            RaycastHit2D wallCollisionLeft = Physics2D.CircleCast(
+                wallCheckLeft.position, collisionCheckRad, Vector2.left,
+                Mathf.Abs(velocity.x * Time.fixedDeltaTime) + 0.05f, groundWallMask
+            ); // Circle cast left to detect wall
+            RaycastHit2D wallCollisionRight = Physics2D.CircleCast(
+                wallCheckRight.position, collisionCheckRad, Vector2.right,
+                Mathf.Abs(velocity.x * Time.fixedDeltaTime) + 0.05f, groundWallMask
+            ); // Circle cast right to detect wall
+            float wallOffset = 0f; // Used to calculate position of closest wall surface
+            Vector2 wallSnap = Vector2.zero; // Position of closest wall surface
+            if (wallCollisionLeft.collider != null)
+            {
+                wallOffset = Mathf.Abs(wallCheckLeft.localPosition.x);
+                wallSnap = new Vector2(wallCollisionLeft.point.x + wallOffset, body.position.y);
+            }
+            else if (wallCollisionRight.collider != null)
+            {
+                wallOffset = Mathf.Abs(wallCheckRight.localPosition.x);
+                wallSnap = new Vector2(wallCollisionRight.point.x - wallOffset, body.position.y);
+            }
+            body.position = wallSnap; // Snaps to wall if inputting climb while on it
+            isClimbing = true;
+            velocity = Vector2.zero;
+
+            if (yDir != 0) velocity.y = Mathf.Lerp(velocity.y, climbSpeed * yDir, frict * Time.fixedDeltaTime);
+        }
+        else isClimbing = false;
     }
 
 
@@ -247,7 +291,9 @@ public class PlayerMovement : MonoBehaviour
     // Calculates downward velocity due to gravity when player is in air.
     // Halts Y velocity when player is on ground.
     {
-        if (!isGrounded)
+        if (isClimbing) return; // Halts downward velocity if climbing
+
+        else if (!isGrounded)
         {
             float appliedGravity = gravity;
             if (velocity.y < 0) appliedGravity *= fallMult; // Applies multiplied gravity when falling
@@ -316,7 +362,7 @@ public class PlayerMovement : MonoBehaviour
     // Calcaultes left/right velocity due to moving.
     // Also checks for edge cases where dirInput should be ignored
     {
-        if (wallJumpLockTimer > 0 || dashTimer > 0) return; // Ignores input when wall jumping or dashing
+        if (wallJumpLockTimer > 0 || dashTimer > 0 || isClimbing) return; // Ignores input when wall jumping/dashing/climbing
 
         else if (isOnWall && MathF.Sign(dirInput) != normalDir) velocity.x = 0f; // Stops tunneling into walls if inputting into them
 

@@ -127,6 +127,24 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CLIMB"",
+                    ""type"": ""Button"",
+                    ""id"": ""701382ad-835f-4841-8163-88da7a82976e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""UPDOWN"",
+                    ""type"": ""Value"",
+                    ""id"": ""e470a587-abd4-4d49-82f4-33b8f818f9d2"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -261,6 +279,94 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""TOGGLESPRINT"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8628c968-2820-4ceb-848f-da2dcdb90730"",
+                    ""path"": ""<Keyboard>/minus"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CLIMB"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""34cf56bc-270d-4326-b94c-622bc82dfb2b"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CLIMB"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""926863bb-051d-4ad0-9bae-85f24ed3ece9"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UPDOWN"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""76a8b790-4922-422f-8299-7aec66cd3f7d"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UPDOWN"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""0640cc44-3498-4095-a674-ee6f5b6b4422"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UPDOWN"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""2723eb30-3f0a-4f22-9b62-5b262e141428"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UPDOWN"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""e47dbc41-cac5-4d50-b9db-153e218b33cd"",
+                    ""path"": ""<Gamepad>/leftStick/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UPDOWN"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""48917b46-0e0d-4459-b85f-52e5299482e7"",
+                    ""path"": ""<Gamepad>/leftStick/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UPDOWN"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -400,6 +506,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_MOVE = m_Player.FindAction("MOVE", throwIfNotFound: true);
         m_Player_DASH = m_Player.FindAction("DASH", throwIfNotFound: true);
         m_Player_TOGGLESPRINT = m_Player.FindAction("TOGGLESPRINT", throwIfNotFound: true);
+        m_Player_CLIMB = m_Player.FindAction("CLIMB", throwIfNotFound: true);
+        m_Player_UPDOWN = m_Player.FindAction("UPDOWN", throwIfNotFound: true);
         // Camera
         m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
         m_Camera_CAMSHIFT = m_Camera.FindAction("CAMSHIFT", throwIfNotFound: true);
@@ -488,6 +596,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_MOVE;
     private readonly InputAction m_Player_DASH;
     private readonly InputAction m_Player_TOGGLESPRINT;
+    private readonly InputAction m_Player_CLIMB;
+    private readonly InputAction m_Player_UPDOWN;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -515,6 +625,14 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/TOGGLESPRINT".
         /// </summary>
         public InputAction @TOGGLESPRINT => m_Wrapper.m_Player_TOGGLESPRINT;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/CLIMB".
+        /// </summary>
+        public InputAction @CLIMB => m_Wrapper.m_Player_CLIMB;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/UPDOWN".
+        /// </summary>
+        public InputAction @UPDOWN => m_Wrapper.m_Player_UPDOWN;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -553,6 +671,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @TOGGLESPRINT.started += instance.OnTOGGLESPRINT;
             @TOGGLESPRINT.performed += instance.OnTOGGLESPRINT;
             @TOGGLESPRINT.canceled += instance.OnTOGGLESPRINT;
+            @CLIMB.started += instance.OnCLIMB;
+            @CLIMB.performed += instance.OnCLIMB;
+            @CLIMB.canceled += instance.OnCLIMB;
+            @UPDOWN.started += instance.OnUPDOWN;
+            @UPDOWN.performed += instance.OnUPDOWN;
+            @UPDOWN.canceled += instance.OnUPDOWN;
         }
 
         /// <summary>
@@ -576,6 +700,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @TOGGLESPRINT.started -= instance.OnTOGGLESPRINT;
             @TOGGLESPRINT.performed -= instance.OnTOGGLESPRINT;
             @TOGGLESPRINT.canceled -= instance.OnTOGGLESPRINT;
+            @CLIMB.started -= instance.OnCLIMB;
+            @CLIMB.performed -= instance.OnCLIMB;
+            @CLIMB.canceled -= instance.OnCLIMB;
+            @UPDOWN.started -= instance.OnUPDOWN;
+            @UPDOWN.performed -= instance.OnUPDOWN;
+            @UPDOWN.canceled -= instance.OnUPDOWN;
         }
 
         /// <summary>
@@ -740,6 +870,20 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnTOGGLESPRINT(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CLIMB" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCLIMB(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "UPDOWN" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnUPDOWN(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Camera" which allows adding and removing callbacks.
