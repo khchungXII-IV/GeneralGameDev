@@ -109,7 +109,7 @@ public class PlayerMovement : MonoBehaviour
     void Awake()
     // Called on scene init
     {
-        halfExtents = col.bounds.extents;
+        halfExtents = col.bounds.extents * 0.99f;
 
         // Init player input system
         controls = new Controls();
@@ -142,6 +142,7 @@ public class PlayerMovement : MonoBehaviour
         move();
         dash();
         resetAirMoves();
+        
         
         if (!isDashing) body.MovePosition(body.position + velocity * Time.fixedDeltaTime);
         if (isRotating) 
@@ -243,6 +244,7 @@ public class PlayerMovement : MonoBehaviour
         checkGrounded();
         checkIsOnWall();
         checkCeilingHit();
+        moveCollide();
     }
 
     void checkGrounded()
@@ -340,6 +342,26 @@ public class PlayerMovement : MonoBehaviour
             if (diff > -0.1f && diff < 0.1f)
                 body.MovePosition(new Vector3(body.position.x, ceilingSnap, body.position.z)); // Only snap to ceiling when close to it
             velocity.y = 0f;
+        }
+    }
+
+    void moveCollide()
+    // Extra collision check based on direction of movement.
+    {
+        if (isDashing) return;
+        
+        Vector3 movement = velocity * Time.fixedDeltaTime;
+
+        if (movement != Vector3.zero)
+        {
+            if (Physics.BoxCast(body.position, halfExtents, movement.normalized, out RaycastHit hit,
+                Quaternion.identity, movement.magnitude + collisionCastDist, gwc)) 
+            {
+                Vector3 snapPos = hit.point - movement.normalized * halfExtents.magnitude;
+                body.MovePosition(snapPos);
+                velocity.x = 0f;
+                velocity.z = 0f;
+            }
         }
     }
 
