@@ -49,14 +49,10 @@ public class CameraMovement : MonoBehaviour
     private float validInputTime = 0.1f;
 
     // Rotate
-    private bool isRotating = false;
-    private Vector2 rotDir = Vector2.zero;
-    public float rotAngle = 45f;
-    private bool rotQueued = false;
-    private bool rotDone = false;
+    private bool isRotating;
+    public float rotAngle = 90f;
     private Vector3 currOffset = Vector3.zero;
-    private float rotateOffTime = 3f;
-    public float rotSpeed = 7.5f;
+    public float rotSpeed = 10f;
     private float rotateCooldownTime = 0.2f;
 
 
@@ -77,7 +73,6 @@ public class CameraMovement : MonoBehaviour
         // Action subscriptions
         controls.Camera.MOVE.performed += onMOVEpressed;
         controls.Camera.MOVE.canceled += onMOVEreleased;
-        controls.Camera.ROTATE.performed += onROTATEpressed;
     }
     
     void FixedUpdate()
@@ -92,10 +87,13 @@ public class CameraMovement : MonoBehaviour
         lookAhead();
         doubleTapReset();
         follow();
-        rotateAutoOff();
 
         transform.position = Vector3.SmoothDamp(transform.position, newCamPos + camShift, ref velocity, smoothing);
-        if (isRotating) transform.rotation = Quaternion.RotateTowards(transform.rotation, angle, rotSpeed);
+        if (isRotating) 
+        {
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, angle, rotSpeed);
+            if (Quaternion.Angle(transform.rotation, angle) < 0.1f) isRotating = false;
+        }
         else transform.rotation = angle;
     }
 
@@ -105,7 +103,6 @@ public class CameraMovement : MonoBehaviour
         // Action unscubscriuptions
         controls.Camera.MOVE.performed -= onMOVEpressed;
         controls.Camera.MOVE.canceled -= onMOVEreleased;
-        controls.Camera.ROTATE.performed -= onROTATEpressed;
         
         controls.Camera.Disable(); // Disable input system
     }
@@ -118,28 +115,14 @@ public class CameraMovement : MonoBehaviour
     void onMOVEpressed(InputAction.CallbackContext ctx)
     // Called when MOVE pressed
     {
-        if (!isRotating) dirInput = ctx.ReadValue<Vector2>();
-        else rotDir = ctx.ReadValue<Vector2>();
+        dirInput = ctx.ReadValue<Vector2>();
     }
 
     void onMOVEreleased(InputAction.CallbackContext ctx)
     {
-        if (!isRotating) dirInput = Vector2.zero;
-        else rotDir = Vector2.zero;
+        dirInput = Vector2.zero;
     }
 
-    void onROTATEpressed(InputAction.CallbackContext ctx)
-    // Called when ROTATE pressed
-    {
-        isRotating = !isRotating;
-
-        if (isRotating)
-        {
-            timers.rotateOff = rotateOffTime;
-            rotQueued = false;
-            rotDone = false;
-        }
-    }
 
     //---------------------------------------------------------------------------------------------------
     // CORE LOGIC
@@ -220,40 +203,26 @@ public class CameraMovement : MonoBehaviour
     {
         if (timers.rotateCooldown > 0f) return;
         
-        if (isRotating)
+        if (isDoubleTap && (dirInput.x < -0.5f || dirInput.x > 0.5f))
         {
-            if (rotDir.x < -0.5f || rotDir.x > 0.5f) rotQueued = true;
-            else rotDone = false;
-
-            if (rotQueued && !rotDone)
+            isRotating = true;
+            if (dirInput.x > 0.5f) 
             {
-                if (rotDir.x > 0.5f) 
-                {
-                    target.GetComponent<PlayerMovement>().rotate(rotAngle);
-                    currOffset = Quaternion.Euler(0f, rotAngle, 0f) * currOffset;
-                    angle = Quaternion.Euler(30f, angle.eulerAngles.y + rotAngle, 0f);
-                }
-                else if (rotDir.x < -0.5f) 
-                {
-                    target.GetComponent<PlayerMovement>().rotate(-rotAngle);
-                    currOffset = Quaternion.Euler(0f, -rotAngle, 0f) * currOffset;
-                    angle = Quaternion.Euler(30f, angle.eulerAngles.y + -rotAngle, 0f);
-                }
-                rotQueued = false;
-                rotDone = true;
-                timers.rotateCooldown = rotateCooldownTime;
+                target.GetComponent<PlayerMovement>().rotate(rotAngle);
+                currOffset = Quaternion.Euler(0f, rotAngle, 0f) * currOffset;
+                angle = Quaternion.Euler(30f, angle.eulerAngles.y + rotAngle, 0f);
             }
+            else if (dirInput.x < -0.5f) 
+            {
+                target.GetComponent<PlayerMovement>().rotate(-rotAngle);
+                currOffset = Quaternion.Euler(0f, -rotAngle, 0f) * currOffset;
+                angle = Quaternion.Euler(30f, angle.eulerAngles.y + -rotAngle, 0f);
+            }
+            isDoubleTap = false;
+            timers.rotateCooldown = rotateCooldownTime;
         }
     }
 
-    void rotateAutoOff()
-    // Automatically turns off rotate mode if player hasn't given rotate direction after period of time;
-    {
-        if (!isRotating) return;
-        if (rotDir.x > 0.5f || rotDir.x < -0.5f) timers.rotateOff = rotateOffTime;
-        if (timers.rotateOff <= 0f) isRotating = false;
-
-    }
 
     void getRelativeDir()
     // Gets relative direction of player based on rotation
@@ -275,7 +244,6 @@ public class CameraMovement : MonoBehaviour
     {
         if (timers.doubleTap > 0f) timers.doubleTap -= Time.fixedDeltaTime;
         if (timers.doubleTapReset > 0f) timers.doubleTapReset -= Time.fixedDeltaTime;
-        if (timers.rotateOff > 0f) timers.rotateOff -= Time.fixedDeltaTime;
         if (timers.rotateCooldown > 0f) timers.rotateCooldown -= Time.fixedDeltaTime;
     }
 }

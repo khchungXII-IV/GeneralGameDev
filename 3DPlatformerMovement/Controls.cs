@@ -320,15 +320,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""ROTATE"",
-                    ""type"": ""Button"",
-                    ""id"": ""a0cc688b-b02a-4757-bb8a-bed3911c01d5"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -441,28 +432,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""MOVE"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""f6b57e1d-5daf-429d-b176-07bc3c4cd0ce"",
-                    ""path"": ""<Keyboard>/rightCtrl"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""ROTATE"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""61be1820-43b1-4369-804d-9b3c7e9b2d2f"",
-                    ""path"": ""<Gamepad>/rightStickPress"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""ROTATE"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -478,7 +447,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         // Camera
         m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
         m_Camera_MOVE = m_Camera.FindAction("MOVE", throwIfNotFound: true);
-        m_Camera_ROTATE = m_Camera.FindAction("ROTATE", throwIfNotFound: true);
     }
 
     ~@Controls()
@@ -690,7 +658,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Camera;
     private List<ICameraActions> m_CameraActionsCallbackInterfaces = new List<ICameraActions>();
     private readonly InputAction m_Camera_MOVE;
-    private readonly InputAction m_Camera_ROTATE;
     /// <summary>
     /// Provides access to input actions defined in input action map "Camera".
     /// </summary>
@@ -706,10 +673,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Camera/MOVE".
         /// </summary>
         public InputAction @MOVE => m_Wrapper.m_Camera_MOVE;
-        /// <summary>
-        /// Provides access to the underlying input action "Camera/ROTATE".
-        /// </summary>
-        public InputAction @ROTATE => m_Wrapper.m_Camera_ROTATE;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -739,9 +702,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @MOVE.started += instance.OnMOVE;
             @MOVE.performed += instance.OnMOVE;
             @MOVE.canceled += instance.OnMOVE;
-            @ROTATE.started += instance.OnROTATE;
-            @ROTATE.performed += instance.OnROTATE;
-            @ROTATE.canceled += instance.OnROTATE;
         }
 
         /// <summary>
@@ -756,9 +716,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @MOVE.started -= instance.OnMOVE;
             @MOVE.performed -= instance.OnMOVE;
             @MOVE.canceled -= instance.OnMOVE;
-            @ROTATE.started -= instance.OnROTATE;
-            @ROTATE.performed -= instance.OnROTATE;
-            @ROTATE.canceled -= instance.OnROTATE;
         }
 
         /// <summary>
@@ -842,12 +799,5 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMOVE(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "ROTATE" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnROTATE(InputAction.CallbackContext context);
     }
 }

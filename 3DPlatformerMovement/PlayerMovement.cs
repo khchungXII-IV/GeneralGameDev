@@ -99,7 +99,7 @@ public class PlayerMovement : MonoBehaviour
     // Rotate
     private Quaternion targetRot;
     private bool isRotating = false;
-    public float rotSpeed = 7.5f;
+    public float rotSpeed = 10f;
 
 
     //---------------------------------------------------------------------------------------------------
