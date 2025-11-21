@@ -39,6 +39,8 @@ public class PlayerMovement : MonoBehaviour
     }
     private TIMERS timers;
     public Transform cam;
+    private Vector3 camF;
+    private Vector3 camR;
 
     // Gravity
     public float gravity = -25f;
@@ -125,6 +127,12 @@ public class PlayerMovement : MonoBehaviour
         controls.Player.DASH.performed += onDASHpressed;
     }
 
+    void Start()
+    // Called on obj init
+    {
+        updateRelativeCamAxes();
+    }
+    
     void FixedUpdate()
     // Called at fixed frequency
     {
@@ -136,12 +144,15 @@ public class PlayerMovement : MonoBehaviour
         getRelativeDir();
         setUpDash();
         checkCollisions();
-        jump();
-        wallJump();
-        airJump();
-        createGravity();
-        wallSlide();
-        move();
+        if (!isDashing)
+        {
+            jump();
+            wallJump();
+            airJump();
+            createGravity();
+            wallSlide();
+            move();
+        }
         dash();
         resetAirMoves();
         
@@ -547,16 +558,18 @@ public class PlayerMovement : MonoBehaviour
     void getRelativeDir()
     // Gets relative direction of player based on rotation
     {
-        Vector3 camForward = cam.forward;
-        camForward.y = 0f;
-        camForward.Normalize();
+        relativeDir = camR * dirInput.x + camF * dirInput.y;
+        relativeFacingDir = camR * facingDir.x + camF * facingDir.y;
+    }
 
-        Vector3 camRight = cam.right;
-        camRight.y = 0f;
-        camRight.Normalize();
+    public void updateRelativeCamAxes()
+    // Called from camera script to update relative axes upon rotation
+    {
+        camF = new Vector3(cam.forward.x, 0f, cam.forward.z);
+        camF.Normalize();
 
-        relativeDir = camRight * dirInput.x + camForward * dirInput.y;
-        relativeFacingDir = camRight * facingDir.x + camForward * facingDir.y;
+        camR = new Vector3(cam.right.x, 0f, cam.right.z);
+        camR.Normalize();
     }
     
 

@@ -93,6 +93,7 @@ public class CameraMovement : MonoBehaviour
         {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, angle, rotSpeed);
             if (Quaternion.Angle(transform.rotation, angle) < 0.1f) isRotating = false;
+            target.GetComponent<PlayerMovement>().updateRelativeCamAxes();
         }
         else transform.rotation = angle;
     }
