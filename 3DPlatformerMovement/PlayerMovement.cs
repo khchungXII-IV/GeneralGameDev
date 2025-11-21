@@ -66,7 +66,7 @@ public class PlayerMovement : MonoBehaviour
     
     // Move
     private Vector2 dirInput = Vector2.zero;
-    public float moveSpeed = 7f;
+    public float moveSpeed = 7.5f;
     public float moveSmoothing = 50f;
     public float sprintMult = 2f;
     private bool isSprinting = false;
@@ -95,6 +95,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 facingDir = Vector2.zero;
     public float dashCooldownTime = 0.15f;
     private Vector3 relativeFacingDir = Vector3.zero;
+    private bool dashQueued = false;
 
     // Rotate
     private Quaternion targetRot;
@@ -133,6 +134,7 @@ public class PlayerMovement : MonoBehaviour
         
         countdownTimers();
         getRelativeDir();
+        setUpDash();
         checkCollisions();
         jump();
         wallJump();
@@ -210,12 +212,7 @@ public class PlayerMovement : MonoBehaviour
     void onDASHpressed(InputAction.CallbackContext ctx)
     // Called when DASH pressed;
     {
-        if (isDashing || timers.dashCooldown > 0f || (!isGrounded && currAirMoves <= 0)) return;
-
-        if (dirInput.sqrMagnitude > 0.01f) dashDir = new Vector3(relativeDir.x, 0f, relativeDir.z);
-        else dashDir = new Vector3(relativeFacingDir.x, 0f, relativeFacingDir.z);
-        dashStart = body.position;
-        isDashing = true;
+        dashQueued = true;
     }
 
 
@@ -484,6 +481,21 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
+    void setUpDash()
+    // Sets up dash
+    {
+        if (dashQueued)
+        {
+            if (isDashing || timers.dashCooldown > 0f || (!isGrounded && currAirMoves <= 0)) return;
+
+            if (dirInput.sqrMagnitude > 0.01f) dashDir = new Vector3(relativeDir.x, 0f, relativeDir.z);
+            else dashDir = new Vector3(relativeFacingDir.x, 0f, relativeFacingDir.z);
+            dashStart = body.position;
+            isDashing = true;
+        }
+        dashQueued = false;
+    }
+    
     void dash()
     // Calculates dash end position and performs dash
     {
