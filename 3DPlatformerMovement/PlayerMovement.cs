@@ -144,6 +144,7 @@ public class PlayerMovement : MonoBehaviour
         getRelativeDir();
         setUpDash();
         checkCollisions();
+
         if (!isDashing)
         {
             jump();
@@ -152,12 +153,13 @@ public class PlayerMovement : MonoBehaviour
             createGravity();
             wallSlide();
             move();
+
+            body.MovePosition(body.position + velocity * Time.fixedDeltaTime);
         }
-        dash();
+        else dash();
+        
         resetAirMoves();
         
-        
-        if (!isDashing) body.MovePosition(body.position + velocity * Time.fixedDeltaTime);
         if (isRotating) 
         {
             body.rotation = Quaternion.RotateTowards(body.rotation, targetRot, rotSpeed);
